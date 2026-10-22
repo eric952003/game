@@ -10,6 +10,7 @@
       --card-bg: #1e1e2c;
       --accent-color: #00ffcc;
       --accent-active: #ff007f;
+      --accent-gold: #ffcc00;
       --text-color: #f0f0f5;
     }
 
@@ -20,7 +21,7 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
-      touch-action: none; /* 防止畫面滾動影響手勢操作 */
+      touch-action: none;
     }
 
     body {
@@ -48,7 +49,7 @@
       position: relative;
     }
 
-    /* 頂部導航列 */
+    /* 頂部列 */
     header {
       padding: 10px 16px;
       display: flex;
@@ -81,7 +82,7 @@
       background: var(--accent-active);
     }
 
-    /* 遊戲大廳 */
+    /* 大廳 */
     #lobby-view {
       flex: 1;
       padding: 16px;
@@ -135,7 +136,6 @@
       padding: 10px 12px 16px 12px;
     }
 
-    /* 畫面外框 */
     #screen-wrapper {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -163,7 +163,7 @@
       pointer-events: none;
     }
 
-    /* 掌機虛擬手把 */
+    /* 控制面板 */
     #controller-panel {
       width: 100%;
       flex: 1;
@@ -173,7 +173,6 @@
       padding: 8px 12px 0 12px;
     }
 
-    /* 十字鍵 */
     .d-pad {
       display: grid;
       grid-template-columns: repeat(3, 58px);
@@ -206,7 +205,6 @@
     .d-right { grid-column: 3; grid-row: 2; }
     .d-down { grid-column: 2; grid-row: 3; }
 
-    /* 動作按鍵 (A / B) */
     .action-pad {
       display: flex;
       gap: 16px;
@@ -239,14 +237,22 @@
 <body>
 
 <div id="arcade-container">
-  <!-- 頂部列 -->
   <header>
     <h1 id="title-text">ARCADE HUB</h1>
     <button id="btn-back" class="btn-back" onclick="switchView('lobby')">返回大廳</button>
   </header>
 
-  <!-- 大廳視圖 -->
+  <!-- 大廳 -->
   <div id="lobby-view">
+    <!-- 經典彈珠台 (置頂推薦) -->
+    <div class="game-card" onclick="launchGame('pinball')">
+      <div class="game-info">
+        <h2>夜市彈珠台 🎰</h2>
+        <p>A 鍵抽倍率 / 按住 B 蓄力發射</p>
+      </div>
+      <div class="game-score" id="high-pinball">代幣: 100</div>
+    </div>
+
     <div class="game-card" onclick="launchGame('snake')">
       <div class="game-info">
         <h2>貪吃蛇</h2>
@@ -275,11 +281,11 @@
   <!-- 遊戲視圖 -->
   <div id="game-view">
     <div id="screen-wrapper">
-      <span class="screen-hint" id="screen-hint">支援觸控拖曳 / 滑動</span>
+      <span class="screen-hint" id="screen-hint">操作提示</span>
       <canvas id="gameCanvas" width="400" height="400"></canvas>
     </div>
 
-    <!-- 掌機控制台 -->
+    <!-- 掌機手把 -->
     <div id="controller-panel">
       <div class="d-pad">
         <div class="d-btn d-up" data-action="UP">▲</div>
@@ -325,7 +331,11 @@
   function launchGame(gameId) {
     switchView('game');
     const hint = document.getElementById('screen-hint');
-    if (gameId === 'snake') {
+    if (gameId === 'pinball') {
+      document.getElementById('title-text').innerText = '夜市彈珠台';
+      hint.innerText = '點 A 押分抽倍率，按住 B 發射';
+      currentGame = new PinballGame(ctx);
+    } else if (gameId === 'snake') {
       document.getElementById('title-text').innerText = '貪吃蛇';
       hint.innerText = '滑動螢幕轉向';
       currentGame = new SnakeGame(ctx);
@@ -364,7 +374,7 @@
   }
 
   // ==========================
-  // 手機全螢幕觸控 / 拖曳優化
+  // 手機全螢幕觸控與拖曳
   // ==========================
   let touchStartX = 0, touchStartY = 0;
   let isTouchingScreen = false;
@@ -391,9 +401,10 @@
     const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
     const canvasX = ((touch.clientX - rect.left) / rect.width) * 400;
+    const canvasY = ((touch.clientY - rect.top) / rect.height) * 400;
 
     if (currentGame && currentGame.handleTouchMove) {
-      currentGame.handleTouchMove(canvasX);
+      currentGame.handleTouchMove(canvasX, canvasY);
     }
   }, { passive: false });
 
@@ -401,10 +412,17 @@
     e.preventDefault();
     isTouchingScreen = false;
     const touch = e.changedTouches[0];
+    const rect = canvas.getBoundingClientRect();
+    const canvasX = ((touch.clientX - rect.left) / rect.width) * 400;
+    const canvasY = ((touch.clientY - rect.top) / rect.height) * 400;
+
+    if (currentGame && currentGame.handleTouchEnd) {
+      currentGame.handleTouchEnd(canvasX, canvasY);
+    }
+
     const dx = touch.clientX - touchStartX;
     const dy = touch.clientY - touchStartY;
-    const absX = Math.abs(dx);
-    const absY = Math.abs(dy);
+    const absX = Math.abs(dx), absY = Math.abs(dy);
 
     if (Math.max(absX, absY) > 25) {
       if (absX > absY) {
@@ -417,16 +435,18 @@
     }
   }, { passive: false });
 
-  // ==========================
-  // 按鍵無延遲長按連發
-  // ==========================
+  // 按鈕長按支援
   const buttonRepeatIntervals = {};
-
   function setupTouchButton(element, action) {
     const startAction = (e) => {
       e.preventDefault();
       element.classList.add('active');
       sendInput(action);
+
+      if (currentGame && currentGame.handleButtonDown) {
+        currentGame.handleButtonDown(action);
+      }
+
       clearInterval(buttonRepeatIntervals[action]);
       buttonRepeatIntervals[action] = setInterval(() => {
         sendInput(action);
@@ -437,12 +457,15 @@
       e.preventDefault();
       element.classList.remove('active');
       clearInterval(buttonRepeatIntervals[action]);
+
+      if (currentGame && currentGame.handleButtonUp) {
+        currentGame.handleButtonUp(action);
+      }
     };
 
     element.addEventListener('touchstart', startAction, { passive: false });
     element.addEventListener('touchend', stopAction, { passive: false });
     element.addEventListener('touchcancel', stopAction, { passive: false });
-
     element.addEventListener('mousedown', startAction);
     element.addEventListener('mouseup', stopAction);
     element.addEventListener('mouseleave', stopAction);
@@ -455,9 +478,22 @@
   window.addEventListener('keydown', (e) => {
     const map = {
       ArrowUp: 'UP', ArrowDown: 'DOWN', ArrowLeft: 'LEFT', ArrowRight: 'RIGHT',
-      KeyZ: 'ACTION_A', KeyX: 'ACTION_B', Space: 'ACTION_A'
+      KeyZ: 'ACTION_A', KeyX: 'ACTION_B', Space: 'ACTION_B'
     };
-    if (map[e.code]) sendInput(map[e.code]);
+    if (map[e.code]) {
+      sendInput(map[e.code]);
+      if (currentGame && currentGame.handleButtonDown) currentGame.handleButtonDown(map[e.code]);
+    }
+  });
+
+  window.addEventListener('keyup', (e) => {
+    const map = {
+      ArrowUp: 'UP', ArrowDown: 'DOWN', ArrowLeft: 'LEFT', ArrowRight: 'RIGHT',
+      KeyZ: 'ACTION_A', KeyX: 'ACTION_B', Space: 'ACTION_B'
+    };
+    if (map[e.code] && currentGame && currentGame.handleButtonUp) {
+      currentGame.handleButtonUp(map[e.code]);
+    }
   });
 
   function updateHighScoresUI() {
@@ -465,6 +501,343 @@
     document.getElementById('high-breakout').innerText = `最高: ${localStorage.getItem('score_breakout') || 0}`;
     const highTetris = document.getElementById('high-tetris');
     if (highTetris) highTetris.innerText = `最高: ${localStorage.getItem('score_tetris') || 0}`;
+    const pinballCoins = document.getElementById('high-pinball');
+    if (pinballCoins) pinballCoins.innerText = `代幣: ${localStorage.getItem('coins_pinball') || 100}`;
+  }
+
+  // ==========================================
+  // 新遊戲：夜市彈珠台 (Night Market Pinball)
+  // ==========================
+  class PinballGame {
+    constructor(ctx) {
+      this.ctx = ctx;
+      this.slotCount = 8;
+      this.slotWidth = 330 / this.slotCount; // 8個球道 (41.25px / 格)
+    }
+
+    init() {
+      this.coins = parseInt(localStorage.getItem('coins_pinball')) || 100;
+      this.bet = 5;
+      this.state = 'BETTING'; // 'BETTING' (押分/跑馬燈), 'AIMING' (蓄力發射), 'ROLLING' (彈珠滾動), 'RESULT'
+      this.multiplier = 2;
+      this.activeSlots = []; // 中獎軌道索引
+      this.rouletteTimer = 0;
+      this.rouletteIndex = 0;
+      this.statusMessage = '按 A 鍵押分並抽倍率';
+
+      // 彈簧發射蓄力 (0 ~ 100)
+      this.springPower = 0;
+      this.isCharging = false;
+
+      // 彈珠物理變數
+      this.ball = null;
+
+      // 產生釘子陣列 (6 排交錯釘子)
+      this.pegs = [];
+      for (let r = 0; r < 6; r++) {
+        const count = r % 2 === 0 ? 7 : 8;
+        const startX = r % 2 === 0 ? 40 : 20;
+        const gap = 310 / count;
+        for (let c = 0; c < count; c++) {
+          this.pegs.push({
+            x: startX + c * gap + gap / 2,
+            y: 120 + r * 35,
+            radius: 3.5
+          });
+        }
+      }
+
+      this.spinMultiplier();
+    }
+
+    // 抽倍率邏輯：倍率越高，開出的中獎軌道越少
+    spinMultiplier() {
+      const tiers = [
+        { mult: 2, winSlots: 5, weight: 40 },  // 2倍: 5個中獎洞 (勝率超高)
+        { mult: 3, winSlots: 4, weight: 30 },  // 3倍: 4個洞 (一半機率)
+        { mult: 5, winSlots: 3, weight: 18 },  // 5倍: 3個洞
+        { mult: 10, winSlots: 2, weight: 9 },  // 10倍: 2個洞
+        { mult: 50, winSlots: 1, weight: 3 }   // 50倍大獎: 僅 1 個洞
+      ];
+
+      const totalWeight = tiers.reduce((a, b) => a + b.weight, 0);
+      let rand = Math.random() * totalWeight;
+      let chosen = tiers[0];
+      for (let t of tiers) {
+        if (rand < t.weight) {
+          chosen = t;
+          break;
+        }
+        rand -= t.weight;
+      }
+
+      this.multiplier = chosen.mult;
+
+      // 隨機抽選中獎球道
+      const pool = [0, 1, 2, 3, 4, 5, 6, 7];
+      pool.sort(() => Math.random() - 0.5);
+      this.activeSlots = pool.slice(0, chosen.winSlots);
+    }
+
+    handleButtonDown(action) {
+      if (this.state === 'AIMING' && (action === 'ACTION_B' || action === 'DOWN')) {
+        this.isCharging = true;
+      }
+    }
+
+    handleButtonUp(action) {
+      if (this.state === 'AIMING' && (action === 'ACTION_B' || action === 'DOWN') && this.isCharging) {
+        this.launchBall();
+      }
+    }
+
+    handleInput(action) {
+      if (this.state === 'BETTING') {
+        if (action === 'ACTION_A') {
+          if (this.coins < this.bet) {
+            this.coins = 100; // 破產免費補幣
+          }
+          this.spinMultiplier();
+          triggerHaptic(40);
+          this.state = 'AIMING';
+          this.statusMessage = '按住 B 鍵或滑動蓄力發射';
+        }
+      } else if (this.state === 'RESULT') {
+        if (action === 'ACTION_A' || action === 'ACTION_B') {
+          this.state = 'BETTING';
+          this.statusMessage = '按 A 鍵押分並抽倍率';
+        }
+      }
+    }
+
+    // 手機直接在發射道拖曳拉彈簧
+    handleTouchStart(canvasX, canvasY) {
+      if (this.state === 'AIMING' && canvasX > 340) {
+        this.isCharging = true;
+      } else if (this.state === 'BETTING') {
+        this.handleInput('ACTION_A');
+      } else if (this.state === 'RESULT') {
+        this.handleInput('ACTION_A');
+      }
+    }
+
+    handleTouchMove(canvasX, canvasY) {
+      if (this.isCharging) {
+        const pull = Math.min(100, Math.max(10, (canvasY - 260) * 1.2));
+        this.springPower = pull;
+      }
+    }
+
+    handleTouchEnd() {
+      if (this.isCharging) {
+        this.launchBall();
+      }
+    }
+
+    launchBall() {
+      this.isCharging = false;
+      this.coins -= this.bet;
+      this.saveCoins();
+      this.state = 'ROLLING';
+      this.statusMessage = '彈珠衝刺中...';
+      triggerHaptic(60);
+
+      const launchSpeed = 9 + (this.springPower / 100) * 5.5; // 力道轉換速度
+      this.ball = {
+        x: 365,
+        y: 350,
+        vx: 0,
+        vy: -launchSpeed,
+        radius: 6.5
+      };
+      this.springPower = 0;
+    }
+
+    saveCoins() {
+      localStorage.setItem('coins_pinball', this.coins);
+      const el = document.getElementById('high-pinball');
+      if (el) el.innerText = `代幣: ${this.coins}`;
+    }
+
+    update() {
+      // 蓄力狀態中如果持續按住則充能
+      if (this.isCharging && this.springPower < 100) {
+        this.springPower += 2.5;
+        if (Math.floor(this.springPower) % 15 === 0) triggerHaptic(10);
+      }
+
+      if (this.state === 'ROLLING' && this.ball) {
+        // 重力與運動
+        this.ball.vy += 0.18; // 重力加速度
+        this.ball.x += this.ball.vx;
+        this.ball.y += this.ball.vy;
+        this.ball.vx *= 0.99; // 空氣阻力
+
+        // 頂部圓弧引導導軌（讓球順著圓頂滑進釘子區）
+        if (this.ball.y < 70 && this.ball.x > 330) {
+          this.ball.vx = -4.5;
+          this.ball.vy = Math.min(this.ball.vy, 1);
+        }
+
+        // 左右邊界反彈
+        if (this.ball.x < 15 + this.ball.radius) {
+          this.ball.x = 15 + this.ball.radius;
+          this.ball.vx = Math.abs(this.ball.vx) * 0.7;
+          triggerHaptic(12);
+        } else if (this.ball.x > 340 - this.ball.radius && this.ball.y > 70) {
+          this.ball.x = 340 - this.ball.radius;
+          this.ball.vx = -Math.abs(this.ball.vx) * 0.7;
+          triggerHaptic(12);
+        }
+
+        // 頂部牆壁反彈
+        if (this.ball.y < 15 + this.ball.radius) {
+          this.ball.y = 15 + this.ball.radius;
+          this.ball.vy = Math.abs(this.ball.vy) * 0.6;
+        }
+
+        // 釘子碰撞檢測
+        this.pegs.forEach(peg => {
+          const dx = this.ball.x - peg.x;
+          const dy = this.ball.y - peg.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < this.ball.radius + peg.radius) {
+            triggerHaptic(18);
+            // 彈開向量計算
+            const angle = Math.atan2(dy, dx);
+            const speed = Math.sqrt(this.ball.vx * this.ball.vx + this.ball.vy * this.ball.vy) * 0.75;
+            this.ball.vx = Math.cos(angle) * (speed + 1.2) + (Math.random() - 0.5) * 0.8;
+            this.ball.vy = Math.sin(angle) * (speed + 1.2);
+            // 推出重疊區
+            this.ball.x = peg.x + Math.cos(angle) * (this.ball.radius + peg.radius);
+            this.ball.y = peg.y + Math.sin(angle) * (this.ball.radius + peg.radius);
+          }
+        });
+
+        // 掉落底部軌道判定區 (Y > 340)
+        if (this.ball.y > 345) {
+          const slotIndex = Math.min(7, Math.max(0, Math.floor((this.ball.x - 10) / this.slotWidth)));
+          const isWin = this.activeSlots.includes(slotIndex);
+
+          this.state = 'RESULT';
+          if (isWin) {
+            const winAmount = this.bet * this.multiplier;
+            this.coins += winAmount;
+            this.saveCoins();
+            this.statusMessage = `🎉 中獎！贏得 ${winAmount} 代幣 (A鍵再玩)`;
+            triggerHaptic(200);
+          } else {
+            this.statusMessage = `未中獎... (A鍵再試)`;
+            triggerHaptic(100);
+          }
+          this.ball = null;
+        }
+      }
+    }
+
+    draw() {
+      // 1. 機台主體底板 (復古木質/夜市霓虹質感)
+      this.ctx.fillStyle = '#0f1019';
+      this.ctx.fillRect(0, 0, 400, 400);
+
+      // 頂部走馬燈看板
+      this.ctx.fillStyle = '#1b1b2a';
+      this.ctx.fillRect(10, 10, 325, 45);
+      this.ctx.strokeStyle = '#32324e';
+      this.ctx.strokeRect(10, 10, 325, 45);
+
+      this.ctx.fillStyle = '#fff';
+      this.ctx.font = 'bold 13px sans-serif';
+      this.ctx.fillText(`代幣: ${this.coins}`, 20, 35);
+      this.ctx.fillText(`押注: ${this.bet}`, 115, 35);
+
+      // 當前倍率標籤
+      this.ctx.fillStyle = '#ff007f';
+      this.ctx.fillRect(200, 16, 120, 32);
+      this.ctx.fillStyle = '#fff';
+      this.ctx.font = 'bold 14px monospace';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText(`倍率: ${this.multiplier}X`, 260, 37);
+      this.ctx.textAlign = 'start';
+
+      // 2. 發射軌道 (右側 345 ~ 385)
+      this.ctx.fillStyle = '#161622';
+      this.ctx.fillRect(345, 60, 40, 330);
+      this.ctx.strokeStyle = '#2d2d42';
+      this.ctx.strokeRect(345, 60, 40, 330);
+
+      // 畫發射彈簧 (Spring)
+      const springHeight = 40 - (this.springPower / 100) * 28;
+      this.ctx.fillStyle = '#ffaa00';
+      this.ctx.fillRect(355, 385 - springHeight, 20, springHeight);
+
+      // 3. 釘子陣繪製
+      this.ctx.fillStyle = '#00ffcc';
+      this.pegs.forEach(peg => {
+        this.ctx.beginPath();
+        this.ctx.arc(peg.x, peg.y, peg.radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.closePath();
+      });
+
+      // 4. 底部 8 個中獎/未中獎軌道
+      const bottomY = 340;
+      for (let i = 0; i < this.slotCount; i++) {
+        const slotX = 10 + i * this.slotWidth;
+        const isActive = this.activeSlots.includes(i);
+
+        // 軌道分隔木條
+        this.ctx.strokeStyle = '#4a4a68';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(slotX, bottomY, this.slotWidth, 55);
+
+        // 中獎軌道亮霓虹綠燈，未中獎為暗紅色
+        this.ctx.fillStyle = isActive ? 'rgba(0, 255, 204, 0.25)' : 'rgba(255, 0, 80, 0.08)';
+        this.ctx.fillRect(slotX + 1, bottomY + 1, this.slotWidth - 2, 53);
+
+        // 軌道上方標註小指示燈
+        this.ctx.beginPath();
+        this.ctx.arc(slotX + this.slotWidth / 2, bottomY + 12, 4.5, 0, Math.PI * 2);
+        this.ctx.fillStyle = isActive ? '#00ffcc' : '#441122';
+        this.ctx.fill();
+        this.ctx.closePath();
+
+        // 軌道文字 (開獎標籤)
+        this.ctx.fillStyle = isActive ? '#00ffcc' : '#666';
+        this.ctx.font = 'bold 10px monospace';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(isActive ? `${this.multiplier}X` : 'X', slotX + this.slotWidth / 2, bottomY + 38);
+        this.ctx.textAlign = 'start';
+      }
+
+      // 5. 繪製彈珠 (如果存在)
+      if (this.ball) {
+        this.ctx.beginPath();
+        this.ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.shadowColor = '#00ffcc';
+        this.ctx.shadowBlur = 8;
+        this.ctx.fill();
+        this.ctx.shadowBlur = 0;
+        this.ctx.closePath();
+      }
+
+      // 6. 狀態資訊與中獎提示列
+      this.ctx.fillStyle = '#fff';
+      this.ctx.font = '12px sans-serif';
+      this.ctx.fillText(this.statusMessage, 15, 80);
+
+      // 發射力道儀表
+      if (this.state === 'AIMING') {
+        this.ctx.fillStyle = '#ffaa00';
+        this.ctx.fillRect(348, 65, 34, (this.springPower / 100) * 120);
+        this.ctx.fillStyle = '#fff';
+        this.ctx.font = '10px sans-serif';
+        this.ctx.fillText('力道', 352, 58);
+      }
+    }
+
+    destroy() {}
   }
 
   // ==========================
@@ -716,7 +1089,7 @@
       this.cols = 10;
       this.rows = 20;
       this.blockSize = 20;
-      this.offsetX = (400 - this.cols * this.blockSize) / 2; // 100px 居中
+      this.offsetX = (400 - this.cols * this.blockSize) / 2;
     }
 
     init() {
