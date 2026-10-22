@@ -6,12 +6,12 @@
   <title>經典復古掌機合輯</title>
   <style>
     :root {
-      --bg-color: #121218;
-      --card-bg: #1e1e2c;
+      --bg-color: #0d0d14;
+      --card-bg: #1a1a28;
       --accent-color: #00ffcc;
       --accent-active: #ff007f;
       --accent-gold: #ffcc00;
-      --text-color: #f0f0f5;
+      --text-color: #f0f0f8;
     }
 
     * {
@@ -42,21 +42,21 @@
       max-height: 860px;
       display: flex;
       flex-direction: column;
-      background: #14141e;
-      border: 2px solid #2e2e42;
+      background: #12121b;
+      border: 2px solid #28283d;
       border-radius: 16px;
       overflow: hidden;
       position: relative;
     }
 
-    /* 頂部列 */
+    /* 頂部導航 */
     header {
       padding: 10px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #1a1a27;
-      border-bottom: 2px solid #2a2a3e;
+      background: #171724;
+      border-bottom: 2px solid #242438;
       z-index: 10;
     }
 
@@ -67,7 +67,7 @@
     }
 
     .btn-back {
-      background: #35354d;
+      background: #33334a;
       border: none;
       color: #fff;
       padding: 6px 14px;
@@ -82,7 +82,7 @@
       background: var(--accent-active);
     }
 
-    /* 大廳 */
+    /* 大廳頁 */
     #lobby-view {
       flex: 1;
       padding: 16px;
@@ -100,13 +100,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border: 1px solid #33334d;
+      border: 1px solid #2e2e46;
       cursor: pointer;
       transition: background 0.1s, border-color 0.1s;
     }
 
     .game-card:active {
-      background: #27273a;
+      background: #252538;
       border-color: var(--accent-color);
     }
 
@@ -122,30 +122,30 @@
 
     .game-score {
       font-size: 0.95rem;
-      color: var(--accent-color);
+      color: var(--accent-gold);
       font-weight: bold;
     }
 
-    /* 遊戲主視圖 */
+    /* 遊戲主畫面 */
     #game-view {
       flex: 1;
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 12px 16px 12px;
+      padding: 8px 12px 14px 12px;
     }
 
     #screen-wrapper {
       width: 100%;
       aspect-ratio: 1 / 1;
-      max-height: 48vh;
-      background: #000;
-      border: 2px solid #3a3a52;
+      max-height: 50vh;
+      background: #08080f;
+      border: 2px solid #33334c;
       border-radius: 12px;
       position: relative;
       overflow: hidden;
-      box-shadow: inset 0 0 16px rgba(0,0,0,0.8);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
     }
 
     canvas {
@@ -156,9 +156,9 @@
 
     .screen-hint {
       position: absolute;
-      top: 8px;
+      top: 6px;
       right: 10px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: rgba(255, 255, 255, 0.45);
       pointer-events: none;
     }
@@ -170,34 +170,34 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 12px 0 12px;
+      padding: 6px 12px 0 12px;
     }
 
     .d-pad {
       display: grid;
-      grid-template-columns: repeat(3, 58px);
-      grid-template-rows: repeat(3, 58px);
+      grid-template-columns: repeat(3, 56px);
+      grid-template-rows: repeat(3, 56px);
       gap: 6px;
     }
 
     .d-btn {
-      background: #242436;
-      border: 2px solid #3d3d5a;
+      background: #202030;
+      border: 2px solid #35354e;
       border-radius: 12px;
       color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       cursor: pointer;
-      box-shadow: 0 4px 0 #181824;
+      box-shadow: 0 4px 0 #13131e;
     }
 
     .d-btn:active, .d-btn.active {
       background: var(--accent-color);
       color: #000;
       transform: translateY(3px);
-      box-shadow: 0 1px 0 #181824;
+      box-shadow: 0 1px 0 #13131e;
     }
 
     .d-up { grid-column: 2; grid-row: 1; }
@@ -212,25 +212,25 @@
     }
 
     .btn-action {
-      width: 68px;
-      height: 68px;
+      width: 66px;
+      height: 66px;
       border-radius: 50%;
-      border: 2px solid #4a4a6e;
-      background: #28283d;
+      border: 2px solid #414160;
+      background: #232336;
       color: #fff;
       font-weight: bold;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      box-shadow: 0 4px 0 #171724;
+      box-shadow: 0 4px 0 #12121c;
     }
 
     .btn-action:active, .btn-action.active {
       background: var(--accent-active);
       transform: translateY(3px);
-      box-shadow: 0 1px 0 #171724;
+      box-shadow: 0 1px 0 #12121c;
     }
   </style>
 </head>
@@ -244,11 +244,10 @@
 
   <!-- 大廳 -->
   <div id="lobby-view">
-    <!-- 經典彈珠台 (置頂推薦) -->
     <div class="game-card" onclick="launchGame('pinball')">
       <div class="game-info">
-        <h2>夜市彈珠台 🎰</h2>
-        <p>A 鍵抽倍率 / 按住 B 蓄力發射</p>
+        <h2>夜市彈珠台 🎰 (震撼升級)</h2>
+        <p>跑馬燈抽倍率 / 密集釘陣 / 爽感爆彩</p>
       </div>
       <div class="game-score" id="high-pinball">代幣: 100</div>
     </div>
@@ -302,6 +301,83 @@
 </div>
 
 <script>
+  // ==========================
+  // Web Audio 街機音效引擎（免外載音檔，超低延遲）
+  // ==========================
+  const SoundFX = {
+    ctx: null,
+    init() {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioCtx();
+      }
+      if (this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+    },
+    // 釘子碰撞清脆金屬聲
+    playPeg(pitchMod = 0) {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const freq = 1200 + pitchMod * 120 + Math.random() * 200;
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.06);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.06);
+    },
+    // 發射蓄力咻一聲
+    playLaunch() {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(700, this.ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.22);
+    },
+    // 跑馬燈切換滴答聲
+    playTick() {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.03);
+    },
+    // 中獎彩金和弦噴發聲
+    playWin(big = false) {
+      if (!this.ctx) return;
+      const notes = big ? [523.25, 659.25, 783.99, 1046.50, 1318.51] : [440, 554.37, 659.25, 880];
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.08);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.08 + 0.4);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(this.ctx.currentTime + idx * 0.08);
+        osc.stop(this.ctx.currentTime + idx * 0.08 + 0.4);
+      });
+    }
+  };
+
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
   let currentGame = null;
@@ -322,6 +398,7 @@
       titleText.innerText = 'ARCADE HUB';
       updateHighScoresUI();
     } else {
+      SoundFX.init();
       lobby.style.display = 'none';
       game.style.display = 'flex';
       backBtn.style.display = 'block';
@@ -367,6 +444,7 @@
   }
 
   function sendInput(action) {
+    SoundFX.init();
     triggerHaptic(20);
     if (currentGame && currentGame.handleInput) {
       currentGame.handleInput(action);
@@ -381,6 +459,7 @@
 
   canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
+    SoundFX.init();
     const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
     touchStartX = touch.clientX;
@@ -435,11 +514,12 @@
     }
   }, { passive: false });
 
-  // 按鈕長按支援
+  // 長按支援
   const buttonRepeatIntervals = {};
   function setupTouchButton(element, action) {
     const startAction = (e) => {
       e.preventDefault();
+      SoundFX.init();
       element.classList.add('active');
       sendInput(action);
 
@@ -476,6 +556,7 @@
   });
 
   window.addEventListener('keydown', (e) => {
+    SoundFX.init();
     const map = {
       ArrowUp: 'UP', ArrowDown: 'DOWN', ArrowLeft: 'LEFT', ArrowRight: 'RIGHT',
       KeyZ: 'ACTION_A', KeyX: 'ACTION_B', Space: 'ACTION_B'
@@ -506,58 +587,78 @@
   }
 
   // ==========================================
-  // 新遊戲：夜市彈珠台 (Night Market Pinball)
-  // ==========================
+  // 夜市彈珠台 (Night Market Pinball) - 震撼升級版
+  // ==========================================
   class PinballGame {
     constructor(ctx) {
       this.ctx = ctx;
       this.slotCount = 8;
-      this.slotWidth = 330 / this.slotCount; // 8個球道 (41.25px / 格)
+      this.slotWidth = 330 / this.slotCount; // 8 個軌道 (每軌約 41.25px)
     }
 
     init() {
       this.coins = parseInt(localStorage.getItem('coins_pinball')) || 100;
       this.bet = 5;
-      this.state = 'BETTING'; // 'BETTING' (押分/跑馬燈), 'AIMING' (蓄力發射), 'ROLLING' (彈珠滾動), 'RESULT'
+      this.state = 'BETTING'; // 'BETTING', 'ROULETTE', 'AIMING', 'ROLLING', 'RESULT'
       this.multiplier = 2;
-      this.activeSlots = []; // 中獎軌道索引
-      this.rouletteTimer = 0;
-      this.rouletteIndex = 0;
+      this.activeSlots = [1, 3, 5];
       this.statusMessage = '按 A 鍵押分並抽倍率';
 
-      // 彈簧發射蓄力 (0 ~ 100)
+      // 跑馬燈狀態
+      this.rouletteList = [2, 3, 5, 10, 50, 2, 3, 5];
+      this.rouletteIdx = 0;
+      this.rouletteSpeed = 0;
+      this.rouletteTimer = 0;
+
+      // 發射與彈簧
       this.springPower = 0;
       this.isCharging = false;
-
-      // 彈珠物理變數
       this.ball = null;
 
-      // 產生釘子陣列 (6 排交錯釘子)
+      // 視覺特效：螢幕震動與彩花粒子
+      this.shakeIntensity = 0;
+      this.particles = [];
+
+      // 釘子陣列：密集 9 排交錯釘子（更具彈跳感與未知性）
       this.pegs = [];
-      for (let r = 0; r < 6; r++) {
-        const count = r % 2 === 0 ? 7 : 8;
-        const startX = r % 2 === 0 ? 40 : 20;
+      for (let r = 0; r < 9; r++) {
+        const count = r % 2 === 0 ? 8 : 9;
+        const startX = r % 2 === 0 ? 32 : 16;
         const gap = 310 / count;
         for (let c = 0; c < count; c++) {
           this.pegs.push({
             x: startX + c * gap + gap / 2,
-            y: 120 + r * 35,
-            radius: 3.5
+            y: 110 + r * 25,
+            radius: 3.2,
+            pulse: 0 // 碰撞發光動畫計時
           });
         }
       }
 
-      this.spinMultiplier();
+      this.neonTimer = 0;
     }
 
-    // 抽倍率邏輯：倍率越高，開出的中獎軌道越少
-    spinMultiplier() {
+    startRoulette() {
+      if (this.coins < this.bet) {
+        this.coins = 100; // 破產補助
+        this.saveCoins();
+      }
+      this.coins -= this.bet;
+      this.saveCoins();
+
+      this.state = 'ROULETTE';
+      this.rouletteSpeed = 2; // 初始高轉速
+      this.rouletteTimer = 0;
+      this.statusMessage = '倍率跑馬燈轉動中...';
+    }
+
+    settleRouletteResult() {
       const tiers = [
-        { mult: 2, winSlots: 5, weight: 40 },  // 2倍: 5個中獎洞 (勝率超高)
-        { mult: 3, winSlots: 4, weight: 30 },  // 3倍: 4個洞 (一半機率)
-        { mult: 5, winSlots: 3, weight: 18 },  // 5倍: 3個洞
-        { mult: 10, winSlots: 2, weight: 9 },  // 10倍: 2個洞
-        { mult: 50, winSlots: 1, weight: 3 }   // 50倍大獎: 僅 1 個洞
+        { mult: 2, winSlots: 5, weight: 42 },
+        { mult: 3, winSlots: 4, weight: 30 },
+        { mult: 5, winSlots: 3, weight: 16 },
+        { mult: 10, winSlots: 2, weight: 9 },
+        { mult: 50, winSlots: 1, weight: 3 }
       ];
 
       const totalWeight = tiers.reduce((a, b) => a + b.weight, 0);
@@ -573,10 +674,14 @@
 
       this.multiplier = chosen.mult;
 
-      // 隨機抽選中獎球道
       const pool = [0, 1, 2, 3, 4, 5, 6, 7];
       pool.sort(() => Math.random() - 0.5);
       this.activeSlots = pool.slice(0, chosen.winSlots);
+
+      this.state = 'AIMING';
+      this.statusMessage = `抽中 ${this.multiplier}X 倍率！按住 B 蓄力發射`;
+      SoundFX.playWin(false);
+      triggerHaptic(60);
     }
 
     handleButtonDown(action) {
@@ -594,13 +699,7 @@
     handleInput(action) {
       if (this.state === 'BETTING') {
         if (action === 'ACTION_A') {
-          if (this.coins < this.bet) {
-            this.coins = 100; // 破產免費補幣
-          }
-          this.spinMultiplier();
-          triggerHaptic(40);
-          this.state = 'AIMING';
-          this.statusMessage = '按住 B 鍵或滑動蓄力發射';
+          this.startRoulette();
         }
       } else if (this.state === 'RESULT') {
         if (action === 'ACTION_A' || action === 'ACTION_B') {
@@ -610,12 +709,11 @@
       }
     }
 
-    // 手機直接在發射道拖曳拉彈簧
     handleTouchStart(canvasX, canvasY) {
       if (this.state === 'AIMING' && canvasX > 340) {
         this.isCharging = true;
       } else if (this.state === 'BETTING') {
-        this.handleInput('ACTION_A');
+        this.startRoulette();
       } else if (this.state === 'RESULT') {
         this.handleInput('ACTION_A');
       }
@@ -623,7 +721,7 @@
 
     handleTouchMove(canvasX, canvasY) {
       if (this.isCharging) {
-        const pull = Math.min(100, Math.max(10, (canvasY - 260) * 1.2));
+        const pull = Math.min(100, Math.max(10, (canvasY - 250) * 1.3));
         this.springPower = pull;
       }
     }
@@ -636,19 +734,20 @@
 
     launchBall() {
       this.isCharging = false;
-      this.coins -= this.bet;
-      this.saveCoins();
       this.state = 'ROLLING';
-      this.statusMessage = '彈珠衝刺中...';
-      triggerHaptic(60);
+      this.statusMessage = '彈珠衝刺中！';
+      SoundFX.playLaunch();
+      triggerHaptic(70);
 
-      const launchSpeed = 9 + (this.springPower / 100) * 5.5; // 力道轉換速度
+      // 蓄力越滿，初始衝刺速度越快 (9 ~ 16)
+      const launchSpeed = 9.5 + (this.springPower / 100) * 6.5;
       this.ball = {
         x: 365,
         y: 350,
         vx: 0,
         vy: -launchSpeed,
-        radius: 6.5
+        radius: 6.5,
+        tail: [] // 殘影軌跡
       };
       this.springPower = 0;
     }
@@ -659,63 +758,130 @@
       if (el) el.innerText = `代幣: ${this.coins}`;
     }
 
+    // 噴發金幣彩花粒子
+    spawnWinParticles(x, y, count = 35) {
+      const colors = ['#ffcc00', '#ff007f', '#00ffcc', '#ffffff', '#ff9900'];
+      for (let i = 0; i < count; i++) {
+        this.particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 8,
+          vy: -Math.random() * 8 - 3,
+          size: Math.random() * 5 + 3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          gravity: 0.25,
+          life: 1.0,
+          decay: Math.random() * 0.02 + 0.015
+        });
+      }
+    }
+
     update() {
-      // 蓄力狀態中如果持續按住則充能
+      this.neonTimer += 0.08;
+
+      // 跑馬燈開獎減速動畫
+      if (this.state === 'ROULETTE') {
+        this.rouletteTimer++;
+        if (this.rouletteTimer % Math.floor(this.rouletteSpeed) === 0) {
+          this.rouletteIdx = (this.rouletteIdx + 1) % this.rouletteList.length;
+          SoundFX.playTick();
+          triggerHaptic(15);
+          this.rouletteSpeed += 0.35; // 逐漸減速
+        }
+        if (this.rouletteSpeed > 16) {
+          this.settleRouletteResult();
+        }
+      }
+
+      // 發射蓄力
       if (this.isCharging && this.springPower < 100) {
-        this.springPower += 2.5;
+        this.springPower += 2.8;
         if (Math.floor(this.springPower) % 15 === 0) triggerHaptic(10);
       }
 
+      // 釘子光暈消退
+      this.pegs.forEach(peg => {
+        if (peg.pulse > 0) peg.pulse -= 0.06;
+      });
+
+      // 粒子物理更新
+      for (let i = this.particles.length - 1; i >= 0; i--) {
+        const p = this.particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.life -= p.decay;
+        if (p.life <= 0) this.particles.splice(i, 1);
+      }
+
+      // 螢幕震動衰減
+      if (this.shakeIntensity > 0) {
+        this.shakeIntensity *= 0.85;
+        if (this.shakeIntensity < 0.2) this.shakeIntensity = 0;
+      }
+
+      // 彈珠物理引擎
       if (this.state === 'ROLLING' && this.ball) {
-        // 重力與運動
-        this.ball.vy += 0.18; // 重力加速度
+        // 殘影紀錄
+        this.ball.tail.unshift({ x: this.ball.x, y: this.ball.y });
+        if (this.ball.tail.length > 5) this.ball.tail.pop();
+
+        this.ball.vy += 0.17; // 重力加速度
         this.ball.x += this.ball.vx;
         this.ball.y += this.ball.vy;
-        this.ball.vx *= 0.99; // 空氣阻力
+        this.ball.vx *= 0.99;
 
-        // 頂部圓弧引導導軌（讓球順著圓頂滑進釘子區）
-        if (this.ball.y < 70 && this.ball.x > 330) {
-          this.ball.vx = -4.5;
-          this.ball.vy = Math.min(this.ball.vy, 1);
+        // 頂部圓弧導軌（流暢圓滑切入釘子區）
+        if (this.ball.y < 65 && this.ball.x > 330) {
+          this.ball.vx = -5.2;
+          this.ball.vy = Math.min(this.ball.vy, 0.5);
+          triggerHaptic(10);
         }
 
-        // 左右邊界反彈
-        if (this.ball.x < 15 + this.ball.radius) {
-          this.ball.x = 15 + this.ball.radius;
-          this.ball.vx = Math.abs(this.ball.vx) * 0.7;
+        // 左右壁碰撞
+        if (this.ball.x < 14 + this.ball.radius) {
+          this.ball.x = 14 + this.ball.radius;
+          this.ball.vx = Math.abs(this.ball.vx) * 0.75;
+          SoundFX.playPeg(-2);
           triggerHaptic(12);
-        } else if (this.ball.x > 340 - this.ball.radius && this.ball.y > 70) {
-          this.ball.x = 340 - this.ball.radius;
-          this.ball.vx = -Math.abs(this.ball.vx) * 0.7;
+        } else if (this.ball.x > 338 - this.ball.radius && this.ball.y > 65) {
+          this.ball.x = 338 - this.ball.radius;
+          this.ball.vx = -Math.abs(this.ball.vx) * 0.75;
+          SoundFX.playPeg(-2);
           triggerHaptic(12);
         }
 
-        // 頂部牆壁反彈
-        if (this.ball.y < 15 + this.ball.radius) {
-          this.ball.y = 15 + this.ball.radius;
+        // 頂棚反彈
+        if (this.ball.y < 12 + this.ball.radius) {
+          this.ball.y = 12 + this.ball.radius;
           this.ball.vy = Math.abs(this.ball.vy) * 0.6;
+          SoundFX.playPeg(1);
         }
 
-        // 釘子碰撞檢測
-        this.pegs.forEach(peg => {
+        // 密集釘子碰撞（帶微隨機彈射物理）
+        this.pegs.forEach((peg, pIdx) => {
           const dx = this.ball.x - peg.x;
           const dy = this.ball.y - peg.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < this.ball.radius + peg.radius) {
+            peg.pulse = 1.0;
+            SoundFX.playPeg(pIdx % 6);
             triggerHaptic(18);
-            // 彈開向量計算
+
             const angle = Math.atan2(dy, dx);
-            const speed = Math.sqrt(this.ball.vx * this.ball.vx + this.ball.vy * this.ball.vy) * 0.75;
-            this.ball.vx = Math.cos(angle) * (speed + 1.2) + (Math.random() - 0.5) * 0.8;
+            const speed = Math.sqrt(this.ball.vx * this.ball.vx + this.ball.vy * this.ball.vy) * 0.82;
+            // 彈跳微機率晃動，讓下落充滿未知懸疑感
+            const wobble = (Math.random() - 0.5) * 1.2;
+            this.ball.vx = Math.cos(angle) * (speed + 1.2) + wobble;
             this.ball.vy = Math.sin(angle) * (speed + 1.2);
-            // 推出重疊區
+
             this.ball.x = peg.x + Math.cos(angle) * (this.ball.radius + peg.radius);
             this.ball.y = peg.y + Math.sin(angle) * (this.ball.radius + peg.radius);
           }
         });
 
-        // 掉落底部軌道判定區 (Y > 340)
-        if (this.ball.y > 345) {
+        // 掉入底槽判定
+        if (this.ball.y > 346) {
           const slotIndex = Math.min(7, Math.max(0, Math.floor((this.ball.x - 10) / this.slotWidth)));
           const isWin = this.activeSlots.includes(slotIndex);
 
@@ -724,11 +890,14 @@
             const winAmount = this.bet * this.multiplier;
             this.coins += winAmount;
             this.saveCoins();
-            this.statusMessage = `🎉 中獎！贏得 ${winAmount} 代幣 (A鍵再玩)`;
-            triggerHaptic(200);
+            this.shakeIntensity = this.multiplier >= 10 ? 12 : 7;
+            this.spawnWinParticles(this.ball.x, 340, this.multiplier >= 10 ? 60 : 35);
+            SoundFX.playWin(this.multiplier >= 10);
+            triggerHaptic(250);
+            this.statusMessage = `💥 大中獎！贏得 ${winAmount} 代幣！(點 A 鍵續玩)`;
           } else {
-            this.statusMessage = `未中獎... (A鍵再試)`;
-            triggerHaptic(100);
+            this.statusMessage = `殘念！沒進中獎洞 (點 A 鍵續玩)`;
+            triggerHaptic(120);
           }
           this.ball = null;
         }
@@ -736,105 +905,158 @@
     }
 
     draw() {
-      // 1. 機台主體底板 (復古木質/夜市霓虹質感)
-      this.ctx.fillStyle = '#0f1019';
+      // 處理畫面震動 (Screen Shake)
+      this.ctx.save();
+      if (this.shakeIntensity > 0) {
+        const shakeX = (Math.random() - 0.5) * this.shakeIntensity;
+        const shakeY = (Math.random() - 0.5) * this.shakeIntensity;
+        this.ctx.translate(shakeX, shakeY);
+      }
+
+      // 1. 機台主體底板
+      this.ctx.fillStyle = '#080911';
       this.ctx.fillRect(0, 0, 400, 400);
 
-      // 頂部走馬燈看板
-      this.ctx.fillStyle = '#1b1b2a';
-      this.ctx.fillRect(10, 10, 325, 45);
-      this.ctx.strokeStyle = '#32324e';
-      this.ctx.strokeRect(10, 10, 325, 45);
+      // 2. 頂部倍率走馬燈儀表
+      this.ctx.fillStyle = '#141422';
+      this.ctx.fillRect(8, 8, 330, 48);
+      this.ctx.strokeStyle = '#2b2b42';
+      this.ctx.strokeRect(8, 8, 330, 48);
 
       this.ctx.fillStyle = '#fff';
       this.ctx.font = 'bold 13px sans-serif';
-      this.ctx.fillText(`代幣: ${this.coins}`, 20, 35);
-      this.ctx.fillText(`押注: ${this.bet}`, 115, 35);
+      this.ctx.fillText(`代幣: ${this.coins}`, 18, 36);
+      this.ctx.fillText(`押注: ${this.bet}`, 108, 36);
 
-      // 當前倍率標籤
-      this.ctx.fillStyle = '#ff007f';
-      this.ctx.fillRect(200, 16, 120, 32);
-      this.ctx.fillStyle = '#fff';
-      this.ctx.font = 'bold 14px monospace';
+      // 倍率看板 (跑馬燈動畫或鎖定標籤)
+      const currentDisplayMult = this.state === 'ROULETTE' ? this.rouletteList[this.rouletteIdx] : this.multiplier;
+      const isJackpot = currentDisplayMult >= 10;
+      this.ctx.fillStyle = isJackpot ? '#ff0055' : '#00e5ff';
+      this.ctx.fillRect(195, 14, 130, 36);
+      this.ctx.fillStyle = '#000';
+      this.ctx.font = 'bold 15px monospace';
       this.ctx.textAlign = 'center';
-      this.ctx.fillText(`倍率: ${this.multiplier}X`, 260, 37);
+      this.ctx.fillText(`倍率: ${currentDisplayMult}X`, 260, 37);
       this.ctx.textAlign = 'start';
 
-      // 2. 發射軌道 (右側 345 ~ 385)
-      this.ctx.fillStyle = '#161622';
-      this.ctx.fillRect(345, 60, 40, 330);
-      this.ctx.strokeStyle = '#2d2d42';
-      this.ctx.strokeRect(345, 60, 40, 330);
+      // 3. 右側發射導軌 (345 ~ 392)
+      this.ctx.fillStyle = '#10111a';
+      this.ctx.fillRect(344, 55, 46, 335);
+      this.ctx.strokeStyle = '#28283e';
+      this.ctx.strokeRect(344, 55, 46, 335);
 
-      // 畫發射彈簧 (Spring)
-      const springHeight = 40 - (this.springPower / 100) * 28;
+      // 頂部圓弧引導導軌
+      this.ctx.strokeStyle = '#3d3d5c';
+      this.ctx.lineWidth = 3;
+      this.ctx.beginPath();
+      this.ctx.arc(330, 65, 55, Math.PI * 1.5, Math.PI * 2);
+      this.ctx.stroke();
+
+      // 發射彈簧
+      const springHeight = 42 - (this.springPower / 100) * 30;
       this.ctx.fillStyle = '#ffaa00';
-      this.ctx.fillRect(355, 385 - springHeight, 20, springHeight);
+      this.ctx.fillRect(357, 388 - springHeight, 20, springHeight);
 
-      // 3. 釘子陣繪製
-      this.ctx.fillStyle = '#00ffcc';
+      // 4. 釘子陣列繪製 (附帶碰撞呼吸發光效果)
       this.pegs.forEach(peg => {
         this.ctx.beginPath();
-        this.ctx.arc(peg.x, peg.y, peg.radius, 0, Math.PI * 2);
+        this.ctx.arc(peg.x, peg.y, peg.radius + (peg.pulse * 1.5), 0, Math.PI * 2);
+        if (peg.pulse > 0) {
+          this.ctx.fillStyle = '#ffffff';
+          this.ctx.shadowColor = '#00ffcc';
+          this.ctx.shadowBlur = 12 * peg.pulse;
+        } else {
+          this.ctx.fillStyle = '#00e5ff';
+          this.ctx.shadowBlur = 0;
+        }
         this.ctx.fill();
         this.ctx.closePath();
       });
+      this.ctx.shadowBlur = 0;
 
-      // 4. 底部 8 個中獎/未中獎軌道
-      const bottomY = 340;
+      // 5. 底部 8 條球道
+      const bottomY = 345;
       for (let i = 0; i < this.slotCount; i++) {
-        const slotX = 10 + i * this.slotWidth;
+        const slotX = 8 + i * this.slotWidth;
         const isActive = this.activeSlots.includes(i);
 
-        // 軌道分隔木條
-        this.ctx.strokeStyle = '#4a4a68';
+        // 軌道分隔框
+        this.ctx.strokeStyle = '#3e3e5c';
         this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(slotX, bottomY, this.slotWidth, 55);
+        this.ctx.strokeRect(slotX, bottomY, this.slotWidth, 52);
 
-        // 中獎軌道亮霓虹綠燈，未中獎為暗紅色
-        this.ctx.fillStyle = isActive ? 'rgba(0, 255, 204, 0.25)' : 'rgba(255, 0, 80, 0.08)';
-        this.ctx.fillRect(slotX + 1, bottomY + 1, this.slotWidth - 2, 53);
+        // 中獎軌道動態霓虹流光
+        if (isActive) {
+          const glowAlpha = 0.25 + Math.sin(this.neonTimer * 2 + i) * 0.12;
+          this.ctx.fillStyle = `rgba(0, 255, 204, ${glowAlpha})`;
+        } else {
+          this.ctx.fillStyle = 'rgba(255, 0, 80, 0.06)';
+        }
+        this.ctx.fillRect(slotX + 1, bottomY + 1, this.slotWidth - 2, 50);
 
-        // 軌道上方標註小指示燈
+        // 指示燈
         this.ctx.beginPath();
-        this.ctx.arc(slotX + this.slotWidth / 2, bottomY + 12, 4.5, 0, Math.PI * 2);
+        this.ctx.arc(slotX + this.slotWidth / 2, bottomY + 11, 4.5, 0, Math.PI * 2);
         this.ctx.fillStyle = isActive ? '#00ffcc' : '#441122';
+        if (isActive) {
+          this.ctx.shadowColor = '#00ffcc';
+          this.ctx.shadowBlur = 8;
+        }
         this.ctx.fill();
+        this.ctx.shadowBlur = 0;
         this.ctx.closePath();
 
-        // 軌道文字 (開獎標籤)
+        // 軌道文字標籤
         this.ctx.fillStyle = isActive ? '#00ffcc' : '#666';
         this.ctx.font = 'bold 10px monospace';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(isActive ? `${this.multiplier}X` : 'X', slotX + this.slotWidth / 2, bottomY + 38);
+        this.ctx.fillText(isActive ? `${this.multiplier}X` : 'X', slotX + this.slotWidth / 2, bottomY + 36);
         this.ctx.textAlign = 'start';
       }
 
-      // 5. 繪製彈珠 (如果存在)
+      // 6. 彈珠與殘影拖尾
       if (this.ball) {
+        // 殘影
+        this.ball.tail.forEach((pos, idx) => {
+          this.ctx.beginPath();
+          this.ctx.arc(pos.x, pos.y, this.ball.radius * (1 - idx * 0.18), 0, Math.PI * 2);
+          this.ctx.fillStyle = `rgba(255, 255, 255, ${0.4 - idx * 0.08})`;
+          this.ctx.fill();
+        });
+
+        // 實體鋼珠
         this.ctx.beginPath();
         this.ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2);
         this.ctx.fillStyle = '#ffffff';
-        this.ctx.shadowColor = '#00ffcc';
-        this.ctx.shadowBlur = 8;
+        this.ctx.shadowColor = '#ff007f';
+        this.ctx.shadowBlur = 10;
         this.ctx.fill();
         this.ctx.shadowBlur = 0;
         this.ctx.closePath();
       }
 
-      // 6. 狀態資訊與中獎提示列
+      // 7. 彩花粒子爆炸繪製
+      this.particles.forEach(p => {
+        this.ctx.fillStyle = p.color;
+        this.ctx.globalAlpha = p.life;
+        this.ctx.fillRect(p.x, p.y, p.size, p.size);
+      });
+      this.ctx.globalAlpha = 1.0;
+
+      // 8. 狀態訊息與蓄力表
       this.ctx.fillStyle = '#fff';
       this.ctx.font = '12px sans-serif';
-      this.ctx.fillText(this.statusMessage, 15, 80);
+      this.ctx.fillText(this.statusMessage, 14, 76);
 
-      // 發射力道儀表
       if (this.state === 'AIMING') {
         this.ctx.fillStyle = '#ffaa00';
-        this.ctx.fillRect(348, 65, 34, (this.springPower / 100) * 120);
+        this.ctx.fillRect(348, 60, 38, (this.springPower / 100) * 110);
         this.ctx.fillStyle = '#fff';
         this.ctx.font = '10px sans-serif';
-        this.ctx.fillText('力道', 352, 58);
+        this.ctx.fillText('力道', 354, 54);
       }
+
+      this.ctx.restore();
     }
 
     destroy() {}
@@ -893,6 +1115,7 @@
 
       if (head.x === this.food.x && head.y === this.food.y) {
         this.score += 10;
+        SoundFX.playPeg(4);
         triggerHaptic(40);
         this.food = {
           x: Math.floor(Math.random() * this.tileCount),
@@ -1005,14 +1228,17 @@
 
       if (this.ballX + this.dx > 400 - this.ballRadius || this.ballX + this.dx < this.ballRadius) {
         this.dx = -this.dx;
+        SoundFX.playPeg(-1);
       }
       if (this.ballY + this.dy < this.ballRadius) {
         this.dy = -this.dy;
+        SoundFX.playPeg(-1);
       } else if (this.ballY + this.dy > 375) {
         if (this.ballX > this.paddleX && this.ballX < this.paddleX + this.paddleWidth) {
           this.dy = -Math.abs(this.dy);
           const hitOffset = (this.ballX - (this.paddleX + this.paddleWidth / 2)) / (this.paddleWidth / 2);
           this.dx = hitOffset * 4.5;
+          SoundFX.playPeg(2);
           triggerHaptic(25);
         } else if (this.ballY > 400) {
           this.triggerGameOver();
@@ -1026,6 +1252,7 @@
             this.dy = -this.dy;
             b.status = 0;
             this.score += 20;
+            SoundFX.playPeg(5);
             triggerHaptic(30);
           }
         }
@@ -1161,11 +1388,13 @@
       if (action === 'LEFT') {
         if (!this.collide(this.current.matrix, this.current.x - 1, this.current.y)) {
           this.current.x--;
+          SoundFX.playTick();
           triggerHaptic(15);
         }
       } else if (action === 'RIGHT') {
         if (!this.collide(this.current.matrix, this.current.x + 1, this.current.y)) {
           this.current.x++;
+          SoundFX.playTick();
           triggerHaptic(15);
         }
       } else if (action === 'DOWN') {
@@ -1177,6 +1406,7 @@
         const rotated = this.rotate(this.current.matrix);
         if (!this.collide(rotated, this.current.x, this.current.y)) {
           this.current.matrix = rotated;
+          SoundFX.playPeg(2);
           triggerHaptic(25);
         }
       } else if (action === 'ACTION_B') {
@@ -1185,6 +1415,7 @@
           this.score += 2;
         }
         this.lockPiece();
+        SoundFX.playPeg(-1);
         triggerHaptic(40);
       }
     }
@@ -1219,6 +1450,7 @@
         const lineScores = [0, 100, 300, 500, 800];
         this.score += lineScores[linesCleared];
         this.lines += linesCleared;
+        SoundFX.playWin(linesCleared >= 4);
         triggerHaptic(60);
       }
     }
