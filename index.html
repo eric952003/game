@@ -20,7 +20,7 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
-      touch-action: none; /* 防止畫面被預設滾動影響手勢操作 */
+      touch-action: none; /* 防止畫面滾動影響手勢操作 */
     }
 
     body {
@@ -48,7 +48,7 @@
       position: relative;
     }
 
-    /* 頂部列 */
+    /* 頂部導航列 */
     header {
       padding: 10px 16px;
       display: flex;
@@ -81,7 +81,7 @@
       background: var(--accent-active);
     }
 
-    /* 大廳 */
+    /* 遊戲大廳 */
     #lobby-view {
       flex: 1;
       padding: 16px;
@@ -89,18 +89,19 @@
       touch-action: pan-y;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
     .game-card {
       background: var(--card-bg);
       border-radius: 12px;
-      padding: 18px;
+      padding: 16px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border: 1px solid #33334d;
       cursor: pointer;
+      transition: background 0.1s, border-color 0.1s;
     }
 
     .game-card:active {
@@ -109,12 +110,12 @@
     }
 
     .game-info h2 {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       margin-bottom: 4px;
     }
 
     .game-info p {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: #8c8ca8;
     }
 
@@ -124,7 +125,7 @@
       font-weight: bold;
     }
 
-    /* 遊戲視圖 */
+    /* 遊戲主視圖 */
     #game-view {
       flex: 1;
       display: none;
@@ -134,7 +135,7 @@
       padding: 10px 12px 16px 12px;
     }
 
-    /* 螢幕顯示區 */
+    /* 畫面外框 */
     #screen-wrapper {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -153,17 +154,16 @@
       display: block;
     }
 
-    /* 提示字眼 */
     .screen-hint {
       position: absolute;
       top: 8px;
       right: 10px;
       font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.45);
       pointer-events: none;
     }
 
-    /* 控制面板 */
+    /* 掌機虛擬手把 */
     #controller-panel {
       width: 100%;
       flex: 1;
@@ -173,7 +173,7 @@
       padding: 8px 12px 0 12px;
     }
 
-    /* 增大十字鍵尺寸與觸控熱區 */
+    /* 十字鍵 */
     .d-pad {
       display: grid;
       grid-template-columns: repeat(3, 58px);
@@ -206,7 +206,7 @@
     .d-right { grid-column: 3; grid-row: 2; }
     .d-down { grid-column: 2; grid-row: 3; }
 
-    /* 動作鍵 */
+    /* 動作按鍵 (A / B) */
     .action-pad {
       display: flex;
       gap: 16px;
@@ -239,12 +239,13 @@
 <body>
 
 <div id="arcade-container">
+  <!-- 頂部列 -->
   <header>
     <h1 id="title-text">ARCADE HUB</h1>
     <button id="btn-back" class="btn-back" onclick="switchView('lobby')">返回大廳</button>
   </header>
 
-  <!-- 大廳 -->
+  <!-- 大廳視圖 -->
   <div id="lobby-view">
     <div class="game-card" onclick="launchGame('snake')">
       <div class="game-info">
@@ -257,20 +258,28 @@
     <div class="game-card" onclick="launchGame('breakout')">
       <div class="game-info">
         <h2>打磚塊</h2>
-        <p>直接拖曳板子 / 左右鍵</p>
+        <p>觸控直接拖曳 / 左右鍵</p>
       </div>
       <div class="game-score" id="high-breakout">最高: 0</div>
     </div>
+
+    <div class="game-card" onclick="launchGame('tetris')">
+      <div class="game-info">
+        <h2>俄羅斯方塊</h2>
+        <p>A 鍵旋轉 / B 鍵秒落 / 十字鍵</p>
+      </div>
+      <div class="game-score" id="high-tetris">最高: 0</div>
+    </div>
   </div>
 
-  <!-- 遊戲主體 -->
+  <!-- 遊戲視圖 -->
   <div id="game-view">
     <div id="screen-wrapper">
       <span class="screen-hint" id="screen-hint">支援觸控拖曳 / 滑動</span>
       <canvas id="gameCanvas" width="400" height="400"></canvas>
     </div>
 
-    <!-- 掌機手把 -->
+    <!-- 掌機控制台 -->
     <div id="controller-panel">
       <div class="d-pad">
         <div class="d-btn d-up" data-action="UP">▲</div>
@@ -324,6 +333,10 @@
       document.getElementById('title-text').innerText = '打磚塊';
       hint.innerText = '按住螢幕拖曳板子';
       currentGame = new BreakoutGame(ctx);
+    } else if (gameId === 'tetris') {
+      document.getElementById('title-text').innerText = '俄羅斯方塊';
+      hint.innerText = 'A 旋轉，B 秒落，長按下鍵加速';
+      currentGame = new TetrisGame(ctx);
     }
     currentGame.init();
     gameLoop();
@@ -351,7 +364,7 @@
   }
 
   // ==========================
-  // 手機全螢幕直接觸控優化
+  // 手機全螢幕觸控 / 拖曳優化
   // ==========================
   let touchStartX = 0, touchStartY = 0;
   let isTouchingScreen = false;
@@ -364,7 +377,6 @@
     touchStartY = touch.clientY;
     isTouchingScreen = true;
 
-    // 將觸控座標換算為 Canvas 400x400 座標傳給遊戲（供打磚塊拖曳使用）
     const canvasX = ((touch.clientX - rect.left) / rect.width) * 400;
     const canvasY = ((touch.clientY - rect.top) / rect.height) * 400;
 
@@ -394,7 +406,6 @@
     const absX = Math.abs(dx);
     const absY = Math.abs(dy);
 
-    // 貪吃蛇等遊戲的輕掃（Swipe）判定
     if (Math.max(absX, absY) > 25) {
       if (absX > absY) {
         sendInput(dx > 0 ? 'RIGHT' : 'LEFT');
@@ -402,13 +413,12 @@
         sendInput(dy > 0 ? 'DOWN' : 'UP');
       }
     } else {
-      // 輕點畫面視為 A 鍵（方便 Game Over 快速重新開始）
       sendInput('ACTION_A');
     }
   }, { passive: false });
 
   // ==========================
-  // 實體按鈕長按連發與觸控最佳化
+  // 按鍵無延遲長按連發
   // ==========================
   const buttonRepeatIntervals = {};
 
@@ -417,7 +427,6 @@
       e.preventDefault();
       element.classList.add('active');
       sendInput(action);
-      // 長按連發設定（針對打磚塊或選單）
       clearInterval(buttonRepeatIntervals[action]);
       buttonRepeatIntervals[action] = setInterval(() => {
         sendInput(action);
@@ -434,7 +443,6 @@
     element.addEventListener('touchend', stopAction, { passive: false });
     element.addEventListener('touchcancel', stopAction, { passive: false });
 
-    // 電腦滑鼠相容
     element.addEventListener('mousedown', startAction);
     element.addEventListener('mouseup', stopAction);
     element.addEventListener('mouseleave', stopAction);
@@ -444,7 +452,6 @@
     setupTouchButton(btn, btn.getAttribute('data-action'));
   });
 
-  // 鍵盤監聽
   window.addEventListener('keydown', (e) => {
     const map = {
       ArrowUp: 'UP', ArrowDown: 'DOWN', ArrowLeft: 'LEFT', ArrowRight: 'RIGHT',
@@ -456,6 +463,8 @@
   function updateHighScoresUI() {
     document.getElementById('high-snake').innerText = `最高: ${localStorage.getItem('score_snake') || 0}`;
     document.getElementById('high-breakout').innerText = `最高: ${localStorage.getItem('score_breakout') || 0}`;
+    const highTetris = document.getElementById('high-tetris');
+    if (highTetris) highTetris.innerText = `最高: ${localStorage.getItem('score_tetris') || 0}`;
   }
 
   // ==========================
@@ -532,11 +541,9 @@
       this.ctx.fillStyle = '#101018';
       this.ctx.fillRect(0, 0, 400, 400);
 
-      // 食物
       this.ctx.fillStyle = '#ff007f';
       this.ctx.fillRect(this.food.x * this.gridSize, this.food.y * this.gridSize, this.gridSize - 2, this.gridSize - 2);
 
-      // 蛇身
       this.ctx.fillStyle = '#00ffcc';
       this.snake.forEach((part) => {
         this.ctx.fillRect(part.x * this.gridSize, part.y * this.gridSize, this.gridSize - 2, this.gridSize - 2);
@@ -564,7 +571,7 @@
   }
 
   // ==========================
-  // 遊戲 2：打磚塊 (Breakout) - 支援拖曳
+  // 遊戲 2：打磚塊 (Breakout)
   // ==========================
   class BreakoutGame {
     constructor(ctx) {
@@ -591,7 +598,6 @@
       }
     }
 
-    // 手指按住並直接拖曳板子
     handleTouchStart(canvasX) {
       if (this.isGameOver) {
         this.init();
@@ -606,7 +612,6 @@
     }
 
     setPaddlePosition(x) {
-      // 讓板子中心對齊手指位置
       this.paddleX = Math.max(0, Math.min(400 - this.paddleWidth, x - (this.paddleWidth / 2)));
     }
 
@@ -625,17 +630,14 @@
       this.ballX += this.dx;
       this.ballY += this.dy;
 
-      // 邊界碰撞
       if (this.ballX + this.dx > 400 - this.ballRadius || this.ballX + this.dx < this.ballRadius) {
         this.dx = -this.dx;
       }
       if (this.ballY + this.dy < this.ballRadius) {
         this.dy = -this.dy;
       } else if (this.ballY + this.dy > 375) {
-        // 板子碰撞
         if (this.ballX > this.paddleX && this.ballX < this.paddleX + this.paddleWidth) {
           this.dy = -Math.abs(this.dy);
-          // 根據擊中板子的位置調整反彈角度
           const hitOffset = (this.ballX - (this.paddleX + this.paddleWidth / 2)) / (this.paddleWidth / 2);
           this.dx = hitOffset * 4.5;
           triggerHaptic(25);
@@ -645,7 +647,6 @@
         }
       }
 
-      // 磚塊碰撞
       this.bricks.forEach(b => {
         if (b.status === 1) {
           if (this.ballX > b.x && this.ballX < b.x + 56 && this.ballY > b.y && this.ballY < b.y + 18) {
@@ -669,7 +670,6 @@
       this.ctx.fillStyle = '#0d111d';
       this.ctx.fillRect(0, 0, 400, 400);
 
-      // 磚塊
       this.bricks.forEach(b => {
         if (b.status === 1) {
           this.ctx.fillStyle = '#ffaa00';
@@ -677,11 +677,9 @@
         }
       });
 
-      // 滑板
       this.ctx.fillStyle = '#00ffcc';
       this.ctx.fillRect(this.paddleX, 380, this.paddleWidth, this.paddleHeight);
 
-      // 球
       this.ctx.beginPath();
       this.ctx.arc(this.ballX, this.ballY, this.ballRadius, 0, Math.PI * 2);
       this.ctx.fillStyle = '#fff';
@@ -694,6 +692,241 @@
 
       if (this.isGameOver) {
         this.ctx.fillStyle = 'rgba(0,0,0,0.75)';
+        this.ctx.fillRect(0, 0, 400, 400);
+        this.ctx.fillStyle = '#ff3366';
+        this.ctx.font = '28px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('遊戲結束', 200, 180);
+        this.ctx.font = '16px sans-serif';
+        this.ctx.fillStyle = '#fff';
+        this.ctx.fillText('點擊任意處或按 A 重開', 200, 220);
+        this.ctx.textAlign = 'start';
+      }
+    }
+
+    destroy() {}
+  }
+
+  // ==========================
+  // 遊戲 3：俄羅斯方塊 (Tetris)
+  // ==========================
+  class TetrisGame {
+    constructor(ctx) {
+      this.ctx = ctx;
+      this.cols = 10;
+      this.rows = 20;
+      this.blockSize = 20;
+      this.offsetX = (400 - this.cols * this.blockSize) / 2; // 100px 居中
+    }
+
+    init() {
+      this.board = Array.from({ length: this.rows }, () => Array(this.cols).fill(0));
+      this.score = 0;
+      this.lines = 0;
+      this.dropCounter = 0;
+      this.dropInterval = 30;
+      this.isGameOver = false;
+
+      this.shapes = {
+        I: [[1, 1, 1, 1]],
+        J: [[1, 0, 0], [1, 1, 1]],
+        L: [[0, 0, 1], [1, 1, 1]],
+        O: [[1, 1], [1, 1]],
+        S: [[0, 1, 1], [1, 1, 0]],
+        T: [[0, 1, 0], [1, 1, 1]],
+        Z: [[1, 1, 0], [0, 1, 1]]
+      };
+
+      this.colors = {
+        I: '#00ffff', J: '#2979ff', L: '#ff9100',
+        O: '#ffd600', S: '#00e676', T: '#d500f9', Z: '#ff1744'
+      };
+
+      this.spawnPiece();
+    }
+
+    spawnPiece() {
+      const keys = Object.keys(this.shapes);
+      const type = keys[Math.floor(Math.random() * keys.length)];
+      this.current = {
+        matrix: this.shapes[type],
+        color: this.colors[type],
+        x: Math.floor((this.cols - this.shapes[type][0].length) / 2),
+        y: 0
+      };
+
+      if (this.collide(this.current.matrix, this.current.x, this.current.y)) {
+        this.triggerGameOver();
+      }
+    }
+
+    collide(matrix, offsetOriginX, offsetOriginY) {
+      for (let y = 0; y < matrix.length; y++) {
+        for (let x = 0; x < matrix[y].length; x++) {
+          if (matrix[y][x] !== 0) {
+            const newX = x + offsetOriginX;
+            const newY = y + offsetOriginY;
+            if (newX < 0 || newX >= this.cols || newY >= this.rows) return true;
+            if (newY >= 0 && this.board[newY][newX] !== 0) return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    rotate(matrix) {
+      return matrix[0].map((_, index) => matrix.map(row => row[index]).reverse());
+    }
+
+    handleInput(action) {
+      if (this.isGameOver && (action === 'ACTION_A' || action === 'ACTION_B')) {
+        this.init();
+        return;
+      }
+      if (this.isGameOver) return;
+
+      if (action === 'LEFT') {
+        if (!this.collide(this.current.matrix, this.current.x - 1, this.current.y)) {
+          this.current.x--;
+          triggerHaptic(15);
+        }
+      } else if (action === 'RIGHT') {
+        if (!this.collide(this.current.matrix, this.current.x + 1, this.current.y)) {
+          this.current.x++;
+          triggerHaptic(15);
+        }
+      } else if (action === 'DOWN') {
+        if (!this.collide(this.current.matrix, this.current.x, this.current.y + 1)) {
+          this.current.y++;
+          this.score += 1;
+        }
+      } else if (action === 'ACTION_A' || action === 'UP') {
+        const rotated = this.rotate(this.current.matrix);
+        if (!this.collide(rotated, this.current.x, this.current.y)) {
+          this.current.matrix = rotated;
+          triggerHaptic(25);
+        }
+      } else if (action === 'ACTION_B') {
+        while (!this.collide(this.current.matrix, this.current.x, this.current.y + 1)) {
+          this.current.y++;
+          this.score += 2;
+        }
+        this.lockPiece();
+        triggerHaptic(40);
+      }
+    }
+
+    lockPiece() {
+      this.current.matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value !== 0) {
+            const boardY = y + this.current.y;
+            const boardX = x + this.current.x;
+            if (boardY >= 0) this.board[boardY][boardX] = this.current.color;
+          }
+        });
+      });
+
+      this.clearLines();
+      this.spawnPiece();
+    }
+
+    clearLines() {
+      let linesCleared = 0;
+      for (let y = this.rows - 1; y >= 0; y--) {
+        if (this.board[y].every(cell => cell !== 0)) {
+          this.board.splice(y, 1);
+          this.board.unshift(Array(this.cols).fill(0));
+          linesCleared++;
+          y++;
+        }
+      }
+
+      if (linesCleared > 0) {
+        const lineScores = [0, 100, 300, 500, 800];
+        this.score += lineScores[linesCleared];
+        this.lines += linesCleared;
+        triggerHaptic(60);
+      }
+    }
+
+    update() {
+      if (this.isGameOver) return;
+
+      if (++this.dropCounter >= this.dropInterval) {
+        this.dropCounter = 0;
+        if (!this.collide(this.current.matrix, this.current.x, this.current.y + 1)) {
+          this.current.y++;
+        } else {
+          this.lockPiece();
+        }
+      }
+    }
+
+    triggerGameOver() {
+      this.isGameOver = true;
+      triggerHaptic(180);
+      const best = localStorage.getItem('score_tetris') || 0;
+      if (this.score > best) localStorage.setItem('score_tetris', this.score);
+    }
+
+    draw() {
+      this.ctx.fillStyle = '#0d0d14';
+      this.ctx.fillRect(0, 0, 400, 400);
+
+      this.ctx.fillStyle = '#141420';
+      this.ctx.fillRect(this.offsetX, 0, this.cols * this.blockSize, 400);
+
+      this.ctx.strokeStyle = '#1e1e2f';
+      this.ctx.lineWidth = 1;
+      for (let c = 0; c <= this.cols; c++) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.offsetX + c * this.blockSize, 0);
+        this.ctx.lineTo(this.offsetX + c * this.blockSize, 400);
+        this.ctx.stroke();
+      }
+
+      for (let r = 0; r < this.rows; r++) {
+        for (let c = 0; c < this.cols; c++) {
+          if (this.board[r][c] !== 0) {
+            this.ctx.fillStyle = this.board[r][c];
+            this.ctx.fillRect(this.offsetX + c * this.blockSize + 1, r * this.blockSize + 1, this.blockSize - 2, this.blockSize - 2);
+          }
+        }
+      }
+
+      if (!this.isGameOver && this.current) {
+        this.ctx.fillStyle = this.current.color;
+        this.current.matrix.forEach((row, y) => {
+          row.forEach((value, x) => {
+            if (value !== 0) {
+              this.ctx.fillRect(
+                this.offsetX + (this.current.x + x) * this.blockSize + 1,
+                (this.current.y + y) * this.blockSize + 1,
+                this.blockSize - 2,
+                this.blockSize - 2
+              );
+            }
+          });
+        });
+      }
+
+      this.ctx.fillStyle = '#fff';
+      this.ctx.font = '14px monospace';
+      this.ctx.fillText(`分數`, 15, 40);
+      this.ctx.fillStyle = '#00ffcc';
+      this.ctx.font = '18px monospace';
+      this.ctx.fillText(`${this.score}`, 15, 65);
+
+      this.ctx.fillStyle = '#fff';
+      this.ctx.font = '14px monospace';
+      this.ctx.fillText(`消行`, 15, 110);
+      this.ctx.fillStyle = '#ff9100';
+      this.ctx.font = '18px monospace';
+      this.ctx.fillText(`${this.lines}`, 15, 135);
+
+      if (this.isGameOver) {
+        this.ctx.fillStyle = 'rgba(0,0,0,0.8)';
         this.ctx.fillRect(0, 0, 400, 400);
         this.ctx.fillStyle = '#ff3366';
         this.ctx.font = '28px sans-serif';
