@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>經典復古掌機合輯</title>
+  <style>
+    :root {
+      --bg-color: #1a1a24;
+      --card-bg: #262636;
+      --accent-color: #00ffcc;
+      --accent-active: #ff007f;
+      --text-color: #f0f0f5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    /* 掌機本體容器 (適配手機滿版與電腦置中) */
+    #arcade-container {
+      width: 100%;
+      max-width: 440px;
+      height: 100vh;
+      max-height: 900px;
+      display: flex;
+      flex-direction: column;
+      background: #14141d;
+      border: 2px solid #33334d;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 頂部資訊列 */
+    header {
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e1e2d;
+      border-bottom: 2px solid #2e2e42;
+    }
+
+    header h1 {
+      font-size: 1.1rem;
+      color: var(--accent-color);
+      letter-spacing: 1px;
+    }
+
+    .btn-back {
+      background: #3a3a52;
+      border: none;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: none;
+    }
+
+    /* 遊戲大廳視圖 */
+    #lobby-view {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .game-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #3d3d57;
+      cursor: pointer;
+      transition: transform 0.1s, border-color 0.1s;
+    }
+
+    .game-card:active {
+      transform: scale(0.98);
+      border-color: var(--accent-color);
+    }
+
+    .game-info h2 {
+      font-size: 1.2rem;
+      margin-bottom: 4px;
+    }
+
+    .game-info p {
+      font-size: 0.85rem;
+      color: #8f8fa8;
+    }
+
+    .game-score {
+      font-size: 0.9rem;
+      color: var(--accent-color);
+      font-weight: bold;
+    }
+
+    /* 遊戲執行視圖 */
+    #game-view {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+    }
+
+    /* 螢幕顯示區 */
+    #screen-wrapper {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      max-height: 50vh;
+      background: #000;
+      border: 3px solid #33334d;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* 虛擬操作面板 */
+    #controller-panel {
+      width: 100%;
+      flex: 1;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0;
+    }
+
+    /* 十字鍵 */
+    .d-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 50px);
+      grid-template-rows: repeat(3, 50px);
+      gap: 4px;
+    }
+
+    .d-btn {
+      background: #2a2a3c;
+      border: 2px solid #454563;
+      border-radius: 8px;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .d-btn:active {
+      background: var(--accent-color);
+      color: #000;
+    }
+
+    .d-up { grid-column: 2; grid-row: 1; }
+    .d-left { grid-column: 1; grid-row: 2; }
+    .d-right { grid-column: 3; grid-row: 2; }
+    .d-down { grid-column: 2; grid-row: 3; }
+
+    /* 功能鍵 */
+    .action-pad {
+      display: flex;
+      gap: 16px;
+    }
+
+    .btn-action {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid #454563;
+      background: #2a2a3c;
+      color: #fff;
+      font-weight: bold;
+      font-size: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .btn-action:active {
+      background: var(--accent-active);
+    }
+  </style>
+</head>
+<body>
+
+<div id="arcade-container">
+  <!-- 頂部列 -->
+  <header>
+    <h1 id="title-text">ARCADE HUB</h1>
+    <button id="btn-back" class="btn-back" onclick="switchView('lobby')">返回大廳</button>
+  </header>
+
+  <!-- 1. 大廳頁面 -->
+  <div id="lobby-view">
+    <div class="game-card" onclick="launchGame('snake')">
+      <div class="game-info">
+        <h2>貪吃蛇</h2>
+        <p>經典吞食成長遊戲</p>
+      </div>
+      <div class="game-score" id="high-snake">最高: 0</div>
+    </div>
+
+    <div class="game-card" onclick="launchGame('breakout')">
+      <div class="game-info">
+        <h2>打磚塊</h2>
+        <p>反彈擊碎所有方塊</p>
+      </div>
+      <div class="game-score" id="high-breakout">最高: 0</div>
+    </div>
+  </div>
+
+  <!-- 2. 遊戲執行頁面 -->
+  <div id="game-view">
+    <div id="screen-wrapper">
+      <canvas id="gameCanvas" width="400" height="400"></canvas>
+    </div>
+
+    <!-- 掌機實體手把區 -->
+    <div id="controller-panel">
+      <div class="d-pad">
+        <div class="d-btn d-up" onclick="sendInput('UP')">▲</div>
+        <div class="d-btn d-left" onclick="sendInput('LEFT')">◀</div>
+        <div class="d-btn d-right" onclick="sendInput('RIGHT')">▶</div>
+        <div class="d-btn d-down" onclick="sendInput('DOWN')">▼</div>
+      </div>
+      <div class="action-pad">
+        <div class="btn-action" onclick="sendInput('ACTION_A')">A</div>
+        <div class="btn-action" onclick="sendInput('ACTION_B')">B</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ==========================
+  // 核心大廳與狀態管理
+  // ==========================
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  let currentGame = null;
+  let animationFrameId = null;
+
+  function switchView(view) {
+    const lobby = document.getElementById('lobby-view');
+    const game = document.getElementById('game-view');
+    const backBtn = document.getElementById('btn-back');
+    const titleText = document.getElementById('title-text');
+
+    if (view === 'lobby') {
+      if (currentGame && currentGame.destroy) currentGame.destroy();
+      cancelAnimationFrame(animationFrameId);
+      lobby.style.display = 'flex';
+      game.style.display = 'none';
+      backBtn.style.display = 'none';
+      titleText.innerText = 'ARCADE HUB';
+      updateHighScoresUI();
+    } else {
+      lobby.style.display = 'none';
+      game.style.display = 'flex';
+      backBtn.style.display = 'block';
+    }
+  }
+
+  function launchGame(gameId) {
+    switchView('game');
+    if (gameId === 'snake') {
+      document.getElementById('title-text').innerText = '貪吃蛇';
+      currentGame = new SnakeGame(ctx);
+    } else if (gameId === 'breakout') {
+      document.getElementById('title-text').innerText = '打磚塊';
+      currentGame = new BreakoutGame(ctx);
+    }
+    currentGame.init();
+    gameLoop();
+  }
+
+  function gameLoop() {
+    if (currentGame) {
+      currentGame.update();
+      currentGame.draw();
+      animationFrameId = requestAnimationFrame(gameLoop);
+    }
+  }
+
+  function sendInput(action) {
+    if (navigator.vibrate) navigator.vibrate(25); // 觸覺反饋
+    if (currentGame && currentGame.handleInput) {
+      currentGame.handleInput(action);
+    }
+  }
+
+  // 鍵盤支援
+  window.addEventListener('keydown', (e) => {
+    const map = {
+      ArrowUp: 'UP', ArrowDown: 'DOWN', ArrowLeft: 'LEFT', ArrowRight: 'RIGHT',
+      KeyZ: 'ACTION_A', KeyX: 'ACTION_B', Space: 'ACTION_A'
+    };
+    if (map[e.code]) sendInput(map[e.code]);
+  });
+
+  // 手機滑動手勢支援 (Swipe)
+  let touchStartX = 0, touchStartY = 0;
+  canvas.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  canvas.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+    const absX = Math.abs(dx), absY = Math.abs(dy);
+
+    if (Math.max(absX, absY) > 30) {
+      if (absX > absY) {
+        sendInput(dx > 0 ? 'RIGHT' : 'LEFT');
+      } else {
+        sendInput(dy > 0 ? 'DOWN' : 'UP');
+      }
+    }
+  }, { passive: true });
+
+  function updateHighScoresUI() {
+    document.getElementById('high-snake').innerText = `最高: ${localStorage.getItem('score_snake') || 0}`;
+    document.getElementById('high-breakout').innerText = `最高: ${localStorage.getItem('score_breakout') || 0}`;
+  }
+
+  // ==========================
+  // 遊戲 1：貪吃蛇 (Snake)
+  // ==========================
+  class SnakeGame {
+    constructor(ctx) {
+      this.ctx = ctx;
+      this.gridSize = 20;
+      this.tileCount = 400 / 20;
+    }
+
+    init() {
+      this.snake = [{ x: 10, y: 10 }];
+      this.food = { x: 15, y: 15 };
+      this.dx = 1;
+      this.dy = 0;
+      this.score = 0;
+      this.speedCounter = 0;
+      this.isGameOver = false;
+    }
+
+    handleInput(action) {
+      if (this.isGameOver && (action === 'ACTION_A' || action === 'ACTION_B')) {
+        this.init();
+        return;
+      }
+      if (action === 'UP' && this.dy === 0) { this.dx = 0; this.dy = -1; }
+      if (action === 'DOWN' && this.dy === 0) { this.dx = 0; this.dy = 1; }
+      if (action === 'LEFT' && this.dx === 0) { this.dx = -1; this.dy = 0; }
+      if (action === 'RIGHT' && this.dx === 0) { this.dx = 1; this.dy = 0; }
+    }
+
+    update() {
+      if (this.isGameOver) return;
+
+      // 控制移動更新頻率 (每 8 幀走一格)
+      if (++this.speedCounter % 8 !== 0) return;
+
+      const head = { x: this.snake[0].x + this.dx, y: this.snake[0].y + this.dy };
+
+      // 撞牆判定
+      if (head.x < 0 || head.x >= this.tileCount || head.y < 0 || head.y >= this.tileCount) {
+        this.triggerGameOver();
+        return;
+      }
+
+      // 撞自己判定
+      for (let segment of this.snake) {
+        if (head.x === segment.x && head.y === segment.y) {
+          this.triggerGameOver();
+          return;
+        }
+      }
+
+      this.snake.unshift(head);
+
+      // 吃食物
+      if (head.x === this.food.x && head.y === this.food.y) {
+        this.score += 10;
+        this.food = {
+          x: Math.floor(Math.random() * this.tileCount),
+          y: Math.floor(Math.random() * this.tileCount)
+        };
+      } else {
+        this.snake.pop();
+      }
+    }
+
+    triggerGameOver() {
+      this.isGameOver = true;
+      const best = localStorage.getItem('score_snake') || 0;
+      if (this.score > best) localStorage.setItem('score_snake', this.score);
+    }
+
+    draw() {
+      this.ctx.fillStyle = '#111';
+      this.ctx.fillRect(0, 0, 400, 400);
+
+      // 畫食物
+      this.ctx.fillStyle = '#ff007f';
+      this.ctx.fillRect(this.food.x * this.gridSize, this.food.y * this.gridSize, this.gridSize - 2, this.gridSize - 2);
+
+      // 畫蛇
+      this.ctx.fillStyle = '#00ffcc';
+      this.snake.forEach((part, i) => {
+        this.ctx.fillRect(part.x * this.gridSize, part.y * this.gridSize, this.gridSize - 2, this.gridSize - 2);
+      });
+
+      // 畫分數
+      this.ctx.fillStyle = '#fff';
+      this.ctx.font = '16px monospace';
+      this.ctx.fillText(`分數: ${this.score}`, 10, 25);
+
+      if (this.isGameOver) {
+        this.ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        this.ctx.fillRect(0, 0, 400, 400);
+        this.ctx.fillStyle = '#ff3366';
+        this.ctx.font = '28px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('遊戲結束', 200, 180);
+        this.ctx.font = '16px sans-serif';
+        this.ctx.fillStyle = '#fff';
+        this.ctx.fillText('點擊 A 鍵重新開始', 200, 220);
+        this.ctx.textAlign = 'start';
+      }
+    }
+
+    destroy() {}
+  }
+
+  // ==========================
+  // 遊戲 2：打磚塊 (Breakout)
+  // ==========================
+  class BreakoutGame {
+    constructor(ctx) {
+      this.ctx = ctx;
+    }
+
+    init() {
+      this.paddleWidth = 80;
+      this.paddleHeight = 10;
+      this.paddleX = 160;
+      this.ballX = 200;
+      this.ballY = 300;
+      this.dx = 3;
+      this.dy = -3;
+      this.ballRadius = 6;
+      this.score = 0;
+      this.isGameOver = false;
+
+      // 生成磚塊 (4行 6列)
+      this.bricks = [];
+      for (let r = 0; r < 4; r++) {
+        for (let c = 0; c < 6; c++) {
+          this.bricks.push({ x: c * 65 + 10, y: r * 25 + 40, status: 1 });
+        }
+      }
+    }
+
+    handleInput(action) {
+      if (this.isGameOver && (action === 'ACTION_A' || action === 'ACTION_B')) {
+        this.init();
+        return;
+      }
+      if (action === 'LEFT') this.paddleX = Math.max(0, this.paddleX - 25);
+      if (action === 'RIGHT') this.paddleX = Math.min(400 - this.paddleWidth, this.paddleX + 25);
+    }
+
+    update() {
+      if (this.isGameOver) return;
+
+      this.ballX += this.dx;
+      this.ballY += this.dy;
+
+      // 牆壁碰撞
+      if (this.ballX + this.dx > 400 - this.ballRadius || this.ballX + this.dx < this.ballRadius) {
+        this.dx = -this.dx;
+      }
+      if (this.ballY + this.dy < this.ballRadius) {
+        this.dy = -this.dy;
+      } else if (this.ballY + this.dy > 380) {
+        // 板子碰撞
+        if (this.ballX > this.paddleX && this.ballX < this.paddleX + this.paddleWidth) {
+          this.dy = -Math.abs(this.dy);
+        } else if (this.ballY > 400) {
+          this.triggerGameOver();
+          return;
+        }
+      }
+
+      // 磚塊碰撞
+      this.bricks.forEach(b => {
+        if (b.status === 1) {
+          if (this.ballX > b.x && this.ballX < b.x + 55 && this.ballY > b.y && this.ballY < b.y + 18) {
+            this.dy = -this.dy;
+            b.status = 0;
+            this.score += 20;
+          }
+        }
+      });
+    }
+
+    triggerGameOver() {
+      this.isGameOver = true;
+      const best = localStorage.getItem('score_breakout') || 0;
+      if (this.score > best) localStorage.setItem('score_breakout', this.score);
+    }
+
+    draw() {
+      this.ctx.fillStyle = '#0f1423';
+      this.ctx.fillRect(0, 0, 400, 400);
+
+      // 畫磚塊
+      this.bricks.forEach(b => {
+        if (b.status === 1) {
+          this.ctx.fillStyle = '#ffaa00';
+          this.ctx.fillRect(b.x, b.y, 55, 18);
+        }
+      });
+
+      // 畫滑板
+      this.ctx.fillStyle = '#00ffcc';
+      this.ctx.fillRect(this.paddleX, 380, this.paddleWidth, this.paddleHeight);
+
+      // 畫球
+      this.ctx.beginPath();
+      this.ctx.arc(this.ballX, this.ballY, this.ballRadius, 0, Math.PI * 2);
+      this.ctx.fillStyle = '#fff';
+      this.ctx.fill();
+      this.ctx.closePath();
+
+      // 分數
+      this.ctx.fillStyle = '#fff';
+      this.ctx.font = '16px monospace';
+      this.ctx.fillText(`分數: ${this.score}`, 10, 25);
+
+      if (this.isGameOver) {
+        this.ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        this.ctx.fillRect(0, 0, 400, 400);
+        this.ctx.fillStyle = '#ff3366';
+        this.ctx.font = '28px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('遊戲結束', 200, 180);
+        this.ctx.font = '16px sans-serif';
+        this.ctx.fillStyle = '#fff';
+        this.ctx.fillText('點擊 A 鍵重新開始', 200, 220);
+        this.ctx.textAlign = 'start';
+      }
+    }
+
+    destroy() {}
+  }
+
+  // 初始化最高分讀取
+  updateHighScoresUI();
+</script>
+</body>
+</html>
